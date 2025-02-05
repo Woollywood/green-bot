@@ -9,10 +9,18 @@ export const routes: RouteObject[] = [
 		children: [
 			{ index: true, lazy: () => import('@/pages/home'), ...hydrateNullFallback() },
 			{
-				path: 'messages',
-				lazy: () => import('@/pages/messages'),
+				lazy: () => import('@/router/components/ProtectedRoutes'),
 				...hydrateNullFallback(),
-				children: [{ path: ':id', lazy: () => import('@/pages/messages/[id]'), ...hydrateNullFallback() }],
+				children: [
+					{
+						path: 'messages',
+						lazy: () => import('@/pages/messages'),
+						...hydrateNullFallback(),
+						children: [
+							{ path: ':id', lazy: () => import('@/pages/messages/[id]'), ...hydrateNullFallback() },
+						],
+					},
+				],
 			},
 		],
 	},
