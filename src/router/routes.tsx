@@ -13,11 +13,20 @@ export const routes: RouteObject[] = [
 				...hydrateNullFallback(),
 				children: [
 					{
-						path: 'messages',
-						lazy: () => import('@/pages/messages'),
-						...hydrateNullFallback(),
+						lazy: () => import('@/layouts/ProtectedLayout'),
 						children: [
-							{ path: ':id', lazy: () => import('@/pages/messages/[id]'), ...hydrateNullFallback() },
+							{
+								path: 'messages',
+								lazy: () => import('@/pages/messages'),
+								...hydrateNullFallback(),
+								children: [
+									{
+										path: ':id',
+										lazy: () => import('@/pages/messages/[id]'),
+										...hydrateNullFallback(),
+									},
+								],
+							},
 						],
 					},
 				],

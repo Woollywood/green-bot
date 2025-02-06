@@ -1,6 +1,6 @@
-import { Button } from '@/components/Button';
-import { Form, FormField, FormItem, FormLabel, FormMessage } from '@/components/Form';
-import { Input } from '@/components/Input';
+import { Button } from '@/components/ui/Button';
+import { Form, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/Form';
+import { Input } from '@/components/ui/Input';
 import { userStore } from '@/store/User';
 import { zodResolver } from '@hookform/resolvers/zod';
 import React from 'react';
@@ -28,7 +28,7 @@ export const Component: React.FC = () => {
 	});
 
 	const onSubmit = ({ apiUrl, idInstance, apiTokenInstance }: SchemaType) => {
-		userStore.setFields(apiUrl, idInstance, apiTokenInstance);
+		userStore.setFields({ apiUrl, idInstance, apiTokenInstance });
 		navigate('/messages');
 	};
 
