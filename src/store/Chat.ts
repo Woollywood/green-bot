@@ -21,7 +21,6 @@ export type IChatItem = {
 
 class Chat {
 	chats: IChatItem[] = [];
-	currentChatId: string | null = null;
 	messages: IMessage[] = [];
 
 	constructor() {
@@ -48,8 +47,8 @@ class Chat {
 		this.chats = this.chats.filter((it) => it !== item);
 	}
 
-	async receiveNotification(receiveTimeout = 5) {
-		const res = await notificationApi.receiveNotification(receiveTimeout);
+	async receiveNotification(receiveTimeout = 5, customCancelEvent: Event, chatId: string) {
+		const res = await notificationApi.receiveNotification(receiveTimeout, customCancelEvent);
 
 		if (!res) {
 			return;
@@ -63,7 +62,7 @@ class Chat {
 			case 'outgoingMessageReceived':
 				{
 					const currentBody = body as INotificationOutgoindMessageReceived;
-					if (currentBody.senderData.chatId === this.currentChatId) {
+					if (currentBody.senderData.chatId === chatId) {
 						this.messages.push({
 							idMessage: currentBody.idMessage,
 							timestamp: currentBody.timestamp,
@@ -76,7 +75,7 @@ class Chat {
 			case 'outgoingAPIMessageReceived':
 				{
 					const currentBody = body as INotificationOutgoingAPIMessageReceived;
-					if (currentBody.senderData.chatId === this.currentChatId) {
+					if (currentBody.senderData.chatId === chatId) {
 						this.messages.push({
 							idMessage: currentBody.idMessage,
 							timestamp: currentBody.timestamp,
@@ -88,7 +87,7 @@ class Chat {
 				break;
 			case 'incomingMessageReceived': {
 				const currentBody = body as INotificationIncomingMessageReceived;
-				if (currentBody.senderData.chatId === this.currentChatId) {
+				if (currentBody.senderData.chatId === chatId) {
 					this.messages.push({
 						idMessage: currentBody.idMessage,
 						timestamp: currentBody.timestamp,

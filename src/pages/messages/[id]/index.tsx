@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/Button';
 import { Textarea } from '@/components/ui/Textarea';
 import { chatStore } from '@/store/Chat';
 import { observer } from 'mobx-react-lite';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useParams } from 'react-router';
 
 export const Component: React.FC = observer(() => {
@@ -15,30 +15,40 @@ export const Component: React.FC = observer(() => {
 		throw new Error('Invalid id');
 	}
 
-	const receiveNotifications = async (notification: INotification | null) => {
-		if (!notification) {
-			return;
+	const textareaRef = useRef<HTMLTextAreaElement>(null);
+	useEffect(() => {
+		if (textareaRef.current) {
+			textareaRef.current.focus();
 		}
-
-		await chatStore.receiveNotification(10);
-	};
+	}, []);
 
 	useEffect(() => {
-		chatStore.currentChatId = id;
+		let unmounted = false;
+		const cancelEvent = new Event('cancel-receive-notification');
+
+		const receiveNotifications = async (notification: INotification | null) => {
+			if (!notification) {
+				return;
+			}
+
+			await chatStore.receiveNotification(10, cancelEvent, id);
+		};
 
 		const receive = async () => {
-			while (true) {
-				const notification = await chatStore.receiveNotification(10);
+			while (!unmounted) {
+				const notification = await chatStore.receiveNotification(10, cancelEvent, id);
 				if (notification) {
 					await receiveNotifications(notification);
 				}
 			}
 		};
+
 		receive();
 
 		return () => {
-			chatStore.currentChatId = null;
+			unmounted = true;
 			chatStore.clearMessages();
+			document.dispatchEvent(cancelEvent);
 		};
 	}, [id]);
 
@@ -64,7 +74,12 @@ export const Component: React.FC = observer(() => {
 				))}
 			</div>
 			<div className='flex items-end gap-2'>
-				<Textarea value={inputValue} onChange={(e) => setInputValue(e.target.value)} />
+				<Textarea
+					value={inputValue}
+					onChange={(e) => setInputValue(e.target.value)}
+					ref={textareaRef}
+					onKeyDown={(e) => e.key === 'Enter' && handleSend()}
+				/>
 				<Button size='icon' disabled={isSending} onClick={handleSend}>
 					<Send />
 				</Button>

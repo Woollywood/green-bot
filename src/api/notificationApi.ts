@@ -82,12 +82,15 @@ interface INotificationDelete {
 }
 
 class NotificationApi extends BaseApi {
-	async receiveNotification(receiveTimeout = 5) {
-		const { data } = await this.request<INotificationResponse | null>({
-			method: 'get',
-			url: `receiveNotification/${userStore.apiTokenInstance}`,
-			params: { receiveTimeout },
-		});
+	async receiveNotification(receiveTimeout = 5, customCancelEvent: Event) {
+		const { data } = await this.request<INotificationResponse | null>(
+			{
+				method: 'get',
+				url: `receiveNotification/${userStore.apiTokenInstance}`,
+				params: { receiveTimeout },
+			},
+			customCancelEvent,
+		);
 
 		return data;
 	}
