@@ -18,7 +18,7 @@ export const NewChat: React.FC = () => {
 
 	const form = useForm<SchemaType>({ defaultValues: { chatName: '' }, resolver: zodResolver(schema) });
 	const onSubmit = ({ chatName }: SchemaType) => {
-		chatStore.add(chatName);
+		chatStore.addChat(chatName);
 		toggleEditing();
 		form.reset();
 	};
