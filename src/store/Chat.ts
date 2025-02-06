@@ -12,6 +12,7 @@ interface IMessage {
 	senderData: ISenderData;
 	timestamp: number;
 	text: string;
+	type: 'me' | 'sender';
 }
 
 export type IChatItem = {
@@ -68,6 +69,7 @@ class Chat {
 							timestamp: currentBody.timestamp,
 							senderData: currentBody.senderData,
 							text: currentBody.messageData.textMessageData.textMessage,
+							type: 'sender',
 						});
 					}
 				}
@@ -81,6 +83,7 @@ class Chat {
 							timestamp: currentBody.timestamp,
 							senderData: currentBody.senderData,
 							text: currentBody.messageData.extendedTextMessageData.text,
+							type: 'sender',
 						});
 					}
 				}
@@ -93,12 +96,23 @@ class Chat {
 						timestamp: currentBody.timestamp,
 						senderData: currentBody.senderData,
 						text: currentBody.messageData.textMessageData.textMessage,
+						type: 'sender',
 					});
 				}
 			}
 		}
 
 		return body;
+	}
+
+	addMessage({ idMessage, chatId, text }: { idMessage: string; chatId: string; text: string }) {
+		this.messages.push({
+			idMessage,
+			senderData: { chatId, chatName: '', sender: '', senderContactName: '', senderName: '' },
+			text,
+			type: 'me',
+			timestamp: Date.now(),
+		});
 	}
 
 	clearMessages() {

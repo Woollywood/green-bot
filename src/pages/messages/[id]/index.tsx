@@ -4,6 +4,7 @@ import { Send } from '@/components/icons/Send';
 import { Button } from '@/components/ui/Button';
 import { Textarea } from '@/components/ui/Textarea';
 import { chatStore } from '@/store/Chat';
+import { cn } from '@/utils';
 import { observer } from 'mobx-react-lite';
 import React, { useEffect, useRef, useState } from 'react';
 import { useParams } from 'react-router';
@@ -61,16 +62,27 @@ export const Component: React.FC = observer(() => {
 		}
 
 		setSending(true);
-		await chatApi.sendMessage(id!, inputValue);
+		const {
+			data: { idMessage },
+		} = await chatApi.sendMessage(id!, inputValue);
+		chatStore.addMessage({ idMessage, chatId: id, text: inputValue });
 		setInputValue('');
 		setSending(false);
 	};
 
 	return (
 		<div className='scroller border-primary grid h-full grid-rows-[1fr_auto] gap-4 rounded-sm border-2 px-6 py-4'>
-			<div>
+			<div className='space-y-1'>
 				{chatStore.messages.map((message) => (
-					<div key={message.idMessage}>{message.text}</div>
+					<div key={message.idMessage} className={cn('flex', { 'justify-end': message.type === 'me' })}>
+						<div
+							className={cn('inline-block rounded-lg p-2', {
+								'bg-primary/40 ml-auto': message.type === 'me',
+								'bg-black/20': message.type === 'sender',
+							})}>
+							{message.text}
+						</div>
+					</div>
 				))}
 			</div>
 			<div className='flex items-end gap-2'>
